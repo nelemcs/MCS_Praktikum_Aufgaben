@@ -14,7 +14,7 @@
         </script>
 
     <!-- Bootstrap 4 Theme cerulean auswählen, siehe https://bootswatch.com/cerulean/ -->
-    <link rel="stylesheet" type="text/css" href="https://bootswatch.com/4/cerulean/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="https://bootswatch.com/4/minty/bootstrap.min.css">
     <!-- DataTables einbinden, siehe https://datatables.net/ -->
 
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.css">
@@ -34,35 +34,61 @@
     <title>entfernungsmesser</title>
 </head>
 <script type="text/javascript">
-    $(document).ready(function () {
-        var tabelle=$('#daten').DataTable({
-            responsive:true
+
+    $(document).ready(function(){
+        $('#suchen').attr('disabled', true);
+        var tabelle = $('#daten').DataTable({
+            responsive: true
         });
-        if ("geolocation" in navigator) {
+        var inputListener = function (event) {
+            var longitude = $('#longitude').val();
+            var latitude = $('#latitude').val();
+            if (longitude.length != 0 && latitude.length != 0) {
+                $('#suchen').attr('disabled', false);
+            } else {
+                $('#suchen').attr('disabled', true);
+            }
+        }
+    $('input').change(inputListener);
+        $('input').keyup(inputListener);
+
+
+        if("geolocation" in navigator) {
             navigator.geolocation.getCurrentPosition(function (position) {
                 $('#longitude').val(position.coords.longitude);
                 $('#latitude').val(position.coords.latitude);
+                $('#suchen').attr('disabled', false);
+
             });
-        }
+        };
+
+
+
+
         $('#suchen').click(function () {
+            $('#suchen').attr('disabled', true);
             var longitude = $('#longitude').val();
             var latitude = $('#latitude').val();
             var apiurl = 'http://localhost:8000/api/entfernung?longitude=' + longitude + '&latitude=' + latitude;
             $.getJSON(apiurl, function (data) {
+                $('#suchen').attr('disabled', false);
                 tabelle.clear();
                 $.each(data, function (index, value) {
-                    tabelle.row.add([value['entfernung'], 
-                                    value['name'],
-                                    value['street'],
-                                    value['e5'].toFixed(2),
-                                    value['e10'].toFixed(2),
-                                    value['diesel'].toFixed(2)])
-                                    .draw(false);
+                    tabelle.row.add([value['entfernung'],
+                    value['name'],
+                    value['brand'],
+                    value['street'],
+                    value['city'],
+                    value['e5'].toFixed(2),
+                    value['e10'].toFixed(2),
+                    value['diesel'].toFixed(2)])
+                        .draw(false);
                     tabelle.responsive.recalc();
                 });
             });
         });
     });
+
 
 </script>
 
@@ -71,6 +97,7 @@
     <nav class="navbar navbar-expended-lg navbar-dark bg-primary">
         <span class="navbar-text">MCS-Entfernungsmesser</span>
     </nav>
+
 
 
     <div id="eingabefeld" class="card m-3 p-3">
@@ -89,14 +116,16 @@
     </div>
 
 
-    <h1>Tankstellen</h1>
+    <h2>Tankstellen</h2>
     <div id="liste">
         <table id="daten" class="table table-striped table-hover display responsive nowrap w-100">
             <thead>
                 <tr>
                     <th scope="col" data-priority="1">Entfernung</th>
-                    <th scope="col" data-priority="2">Name</th>
-                    <th scope="col" data-priority="3">Adresse</th>
+                    <th scope="col" data-priority="3">Name</th>
+                    <th scope="col" data-priority="2">Brand</th>
+                    <th scope="col" data-priority="1">Adresse</th>
+                    <th scope="col" data-priority="1">Stadt</th>
                     <th scope="col" data-priority="1">e5</th>
                     <th scope="col" data-priority="2">e10</th>
                     <th scope="col" data-priority="2">Diesel</th>
