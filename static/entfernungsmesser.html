@@ -1,119 +1,113 @@
 <!DOCTYPE html>
 <html lang="de">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <!-- Bootstrap 4 einbinden, siehe https://getbootstrap.com/docs/4.6/getting-started/introduction/-->
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-fQybjgWLrvvRgtW6bFlB7jaZrFsaBXjsOMm/tB9LTS58ONXgqbR9W8oWht/amnpF" crossorigin="anonymous">
+        </script>
+
+    <!-- Bootstrap 4 Theme cerulean auswählen, siehe https://bootswatch.com/cerulean/ -->
+    <link rel="stylesheet" type="text/css" href="https://bootswatch.com/4/cerulean/bootstrap.min.css">
+    <!-- DataTables einbinden, siehe https://datatables.net/ -->
+
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.css">
+
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.js">
+
+    </script>
+
+    <!-- Responsive Design, siehe https://datatables.net/extensions/responsive/ -->
+
+    <link rel="stylesheet" type="text/css"
+        href="https://cdn.datatables.net/responsive/2.3.0/css/responsive.dataTables.min.css" />
+
+    <script type="text/javascript" src="https://cdn.datatables.net/responsive/2.3.0/js/dataTables.responsive.min.js">
+
+    </script>
     <title>entfernungsmesser</title>
 </head>
 <script type="text/javascript">
-    $(document).ready(function(){
-        if("geolocation" in navigator){
-            navigator.geolocation.getCurrentPosition(function(position){
+    $(document).ready(function () {
+        var tabelle=$('#daten').DataTable({
+            responsive:true
+        });
+        if ("geolocation" in navigator) {
+            navigator.geolocation.getCurrentPosition(function (position) {
                 $('#longitude').val(position.coords.longitude);
                 $('#latitude').val(position.coords.latitude);
             });
         }
-        $('#suchen').click(function(){
-            var longitude= $('#longitude').val();
-            var latitude= $('#latitude').val();
-            var apiurl= 'http://localhost:8000/api/entfernung?longitude='+longitude+'&latitude='+latitude;
-            $('#daten >tbody>tr').remove();
-            $('#daten >tbody').append("<tr></tr>");
-            $.getJSON(apiurl,function(data){
-                $.each(data,function(index,value){
-                    console.log(value);
-                    var html=`<tr>
-                        <td>${value['entfernung']}</td>
-                        <td>${value['name']}</td>
-                        <td>${value['street']}</td>
-                        <td>${value['e5'].toFixed(2)}</td>
-                        <td>${value['e10'].toFixed(2)}</td>
-                        <td>${value['diesel'].toFixed(2)}</td>
-                        </tr>`;
-                    $('#daten tr:last').after(html);
+        $('#suchen').click(function () {
+            var longitude = $('#longitude').val();
+            var latitude = $('#latitude').val();
+            var apiurl = 'http://localhost:8000/api/entfernung?longitude=' + longitude + '&latitude=' + latitude;
+            $.getJSON(apiurl, function (data) {
+                tabelle.clear();
+                $.each(data, function (index, value) {
+                    tabelle.row.add([value['entfernung'], 
+                                    value['name'],
+                                    value['street'],
+                                    value['e5'].toFixed(2),
+                                    value['e10'].toFixed(2),
+                                    value['diesel'].toFixed(2)])
+                                    .draw(false);
+                    tabelle.responsive.recalc();
                 });
             });
         });
     });
 
 </script>
-<style>
-    p {
-            font-family: Verdana, Geneva, Tahoma, sans-serif;
-        }
-    h2 {
-            font-family: 'Times New Roman', Times, serif;
-            text-align: left;
-            font-size: x-large;
-    }
-    .Rahmen{
-        border: 2px solid black;
-        display: flex;
-      flex-direction: row;
-        }
-        h1{
-            font-family: 'Times New Roman', Times, serif;
-            text-align: center;
-            font-size: large;
-            border:1px solid red;
-        }
-        .box {
-          display: flex;
-          flex-direction: row;
-          justify-content: center;
-        }
-        
-        .button{
-            width: 5cm;
-            height:6mm;
-            align-self: center;
-        }
-        .category{
-           font-family: 'Times New Roman', Times, serif;
-           font-size: large;
-           margin-right: 2em;
-        }
-</style>
+
 
 <body>
-    <div id="MCS Entfernungsmesser" class="Rahmen">
-        <h2>MCS-Entfernungsmesser</h2>
-    </div> 
+    <nav class="navbar navbar-expended-lg navbar-dark bg-primary">
+        <span class="navbar-text">MCS-Entfernungsmesser</span>
+    </nav>
 
 
-    <div id="eingabefeld" class="box">
-    <p class="category"><label>longitude:
-        <textarea class="category" id="longitude" required="required"></textarea></label>
-    <p class="category"><label>latitude: 
-        <textarea class="category" id="latitude" required="required"></textarea></label>
-       </p>
-    <button type="button" id="suchen" class="button">Suchen</button>
+    <div id="eingabefeld" class="card m-3 p-3">
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Longitude:</span>
+            </div>
+            <input id="longitude" type="text" class="form-control" />
+
+            <div class="input-group-prepend ml-3">
+                <span class="input-group-text">Latitude:</span>
+            </div>
+            <input id="latitude" type="text" class="form-control" />
+            <button type="button" id="suchen" class="btn btn-primary ml-3">Suchen</button>
+        </div>
     </div>
-       
-       
-       <h1>Tankstellen</h1>
-        <div id="liste">
-        <table id="daten"> 
+
+
+    <h1>Tankstellen</h1>
+    <div id="liste">
+        <table id="daten" class="table table-striped table-hover display responsive nowrap w-100">
             <thead>
                 <tr>
-                    <td width=150><b>Entfernung</b></td>
-                    <td width=150><b>Name</b></td>
-                    <td width=150><b>Adresse</b></td>
-                    <td width=150><b>e5</b></td>
-                    <td width=150><b>e10</b></td>
-                    <td width=150><b>Diesel</b></td>
+                    <th scope="col" data-priority="1">Entfernung</th>
+                    <th scope="col" data-priority="2">Name</th>
+                    <th scope="col" data-priority="3">Adresse</th>
+                    <th scope="col" data-priority="1">e5</th>
+                    <th scope="col" data-priority="2">e10</th>
+                    <th scope="col" data-priority="2">Diesel</th>
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td></td>
-                </tr>
             </tbody>
         </table>
     </div>
-   
+
 
 </body>
+
 </html>
