@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <title>entfernungsmesser</title>
+</head>
+<script type="text/javascript">
+    $(document).ready(function(){
+        if("geolocation" in navigator){
+            navigator.geolocation.getCurrentPosition(function(position){
+                $('#longitude').val(position.coords.longitude);
+                $('#latitude').val(position.coords.latitude);
+            });
+        }
+        $('#suchen').click(function(){
+            var longitude= $('#longitude').val();
+            var latitude= $('#latitude').val();
+            var apiurl= 'http://localhost:8000/api/entfernung?longitude='+longitude+'&latitude='+latitude;
+            $('#daten >tbody>tr').remove();
+            $('#daten >tbody').append("<tr></tr>");
+            $.getJSON(apiurl,function(data){
+                $.each(data,function(index,value){
+                    console.log(value);
+                    var html=`<tr>
+                        <td>${value['entfernung']}</td>
+                        <td>${value['name']}</td>
+                        <td>${value['street']}</td>
+                        <td>${value['e5'].toFixed(2)}</td>
+                        <td>${value['e10'].toFixed(2)}</td>
+                        <td>${value['diesel'].toFixed(2)}</td>
+                        </tr>`;
+                    $('#daten tr:last').after(html);
+                });
+            });
+        });
+    });
+
+</script>
+<style>
+    p {
+            font-family: Verdana, Geneva, Tahoma, sans-serif;
+        }
+    h2 {
+            font-family: 'Times New Roman', Times, serif;
+            text-align: left;
+            font-size: x-large;
+    }
+    .Rahmen{
+        border: 2px solid black;
+        display: flex;
+      flex-direction: row;
+        }
+        h1{
+            font-family: 'Times New Roman', Times, serif;
+            text-align: center;
+            font-size: large;
+            border:1px solid red;
+        }
+        .box {
+          display: flex;
+          flex-direction: row;
+          justify-content: center;
+        }
+        
+        .button{
+            width: 5cm;
+            height:6mm;
+            align-self: center;
+        }
+        .category{
+           font-family: 'Times New Roman', Times, serif;
+           font-size: large;
+           margin-right: 2em;
+        }
+</style>
+
+<body>
+    <div id="MCS Entfernungsmesser" class="Rahmen">
+        <h2>MCS-Entfernungsmesser</h2>
+    </div> 
+
+
+    <div id="eingabefeld" class="box">
+    <p class="category"><label>longitude:
+        <textarea class="category" id="longitude" required="required"></textarea></label>
+    <p class="category"><label>latitude: 
+        <textarea class="category" id="latitude" required="required"></textarea></label>
+       </p>
+    <button type="button" id="suchen" class="button">Suchen</button>
+    </div>
+       
+       
+       <h1>Tankstellen</h1>
+        <div id="liste">
+        <table id="daten"> 
+            <thead>
+                <tr>
+                    <td width=150><b>Entfernung</b></td>
+                    <td width=150><b>Name</b></td>
+                    <td width=150><b>Adresse</b></td>
+                    <td width=150><b>e5</b></td>
+                    <td width=150><b>e10</b></td>
+                    <td width=150><b>Diesel</b></td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+   
+
+</body>
+</html>

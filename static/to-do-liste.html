@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- JQuery einbinden um JavaScript zu vereinfachen, siehe https://jquery.com/ -->
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+
+    <script type="text/javascript">
+        var zeilen = 0;
+        $(document).ready(function(){
+            $('#hinzufuegen').click(function(){
+                var eingabe = $('#eingabebereich').val();
+                var datum = $('#eingabe').val();
+                console.log(eingabe);
+                $('#daten tr:last').after("<tr id = \""+zeilen+"\" ><td class = \"trennlinie\">"+datum+"</td><td>"+eingabe+"</td></tr>");
+                $('#'+zeilen).click(function(){
+                    console.log();
+                    $(this).toggleClass("erledigt");
+                    });
+                zeilen+=1;
+            });    
+        
+        });
+    </script>
+   
+    
+    <style>
+        h1 {
+            font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+            font-style:italic;
+            text-align: center;
+        }
+        .Rahmen{
+            border: 3px solid black;
+            display: flex;
+      flex-direction: row;
+        }
+        fieldset {
+            display: Inline;
+            border: Solid 2px rgb(0, 179, 255);
+        }
+        textarea {
+            width: 300px;
+            height: 50px;
+            resize: none;
+        }
+        
+        
+
+        div#liste {
+            width: 500px;
+            height: 250px;
+            overflow: Auto;
+            background-color: #FFFFFF;
+            background-image:
+            linear-gradient(90deg, transparent 150px, #e6e2f1 150px, #d6d4e4 150px, transparent 150px);
+            background-size: 100% 2.2em;
+            resize: vertical;
+        }
+        
+        .erledigt{
+            text-decoration: line-through;
+        }
+       .trennlinie{
+        border-right: 1px solid black; 
+       }
+
+    </style>
+
+    <title>To-Do-Liste</title>
+</head>
+
+<body>
+    <div id="Meine To-Do-Liste" class="header">
+        <h1>Meine To-Do Liste</h1>
+        
+      </div>
+    
+    
+    <form id="Form">
+        <fieldset>
+         <legend>ToDo's</legend>
+        
+        <p><label>Aufgabe: <br>
+         <textarea id="eingabebereich" required="required"></textarea></label>
+        </p>
+        
+        <p><label>Datum: 
+         <input type="date" id="eingabe"  required="required" value= ""/></label>&emsp;
+         <button type="button" id="hinzufuegen">Hinzufügen</button>
+        </p>
+       
+        <div id="liste">
+            <table id="daten"> 
+                   <thead>
+                    <tr>
+                        <td width=150><b>Erledigen bis...</b</td>
+                        <td width=150><b>Aufgabe</b></td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                          </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        </fieldset>
+        </form>
+        
+
+</body>
+
+
+</html>
