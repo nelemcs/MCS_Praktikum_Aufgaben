@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- JQuery einbinden um JavaScript zu vereinfachen, siehe https://jquery.com/ -->
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+
+    <!-- Leaflet für Geo Karten einbinden, siehe https://leafletjs.com/-->
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.8.0/dist/leaflet.css"
+        integrity="sha512-hoalWLoI8r4UszCkZ5kL8vayOGVae1oxXe/2A4AO6J9+580uKHDO3JdHb7NzwwzK5xr/Fs0W40kiNHxM9vyTtQ=="
+        crossorigin="" />
+
+    <script src="https://unpkg.com/leaflet@1.8.0/dist/leaflet.js"
+        integrity="sha512-BB3hKbKWOc9Ez/TAwyWxNXeoV9c1v6FIeYiBieIWkpLjauysF18NzgR1MBNBXf8/KABdlkX68nAhlwcDFLGPCQ=="
+        crossorigin=""></script>
+    <style>
+        body {
+            padding: 0px;
+            margin: 0px;
+        }
+
+        html,
+        body,
+        #map {
+            height: 100%;
+            width: 100%;
+        }
+    </style>
+    <title>geokarte</title>
+
+</head>
+<script type="text/javascript">
+    $(document).ready(function () {
+        var longitude = 9.997462;
+        var latitude = 53.6761905;
+
+        if ("geolocation" in navigator) {
+            navigator.geolocation.getCurrentPosition(function (position) {
+                longitude = position.coords.longitude;
+                latitude = position.coords.latitude;
+                var marker = L.marker([position.coords.latitude, position.coords.longitude]).addTo(map);
+                marker.bindPopup("Aktueller Standort").openPopup();
+
+            });
+        };
+        var map = L.map('map');
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19
+        }).addTo(map);
+        map.locate({ setView: true, mapZoom: 16 })
+        var apiurl = 'http://localhost:8000/api/entfernung?longitude=' + longitude + '&latitude=' + latitude;
+        $.getJSON(apiurl, function (data) {
+            $.each(data, function (index, value) {
+                var markertankstelle = L.marker([value['latitude'], value['longitude']]).addTo(map);
+                //marker.bindPopup(popupContent).openPopup();
+                //var popup = L.popup().setContent()
+                var popupstankstelle = markertankstelle.bindPopup('<a href= "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"'+ value['latitude'] +',' + value['longitude'] + '">' + value['name'] + '<br><ul><li> E5: ' + value['e5'].toFixed(2) + ' €</li><li> E10: ' + value['e10'].toFixed(2) + '€</li><li> Diesel: ' + value['diesel'].toFixed(2) + ' €</li></ul>');
+            });
+        });
+    });
+</script>
+
+<body>
+    <div id="map"></div>
+</body>
+
+</html>
